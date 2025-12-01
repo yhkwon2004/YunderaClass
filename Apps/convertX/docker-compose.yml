@@ -1,59 +1,30 @@
-# ============================================================================
-# 실습 2: ConvertX - 범용 파일 변환기
-# ============================================================================
-# 💡 이 파일에는 15개의 빈칸이 있습니다
-# 📋 questions.md 파일의 객관식 문제를 보고 빈칸을 채우세요!
-# 🎯 특별 학습 포인트: Root 권한이 필요한 특수 케이스!
-# ============================================================================
-
-name: __________(1)__________
+name: convertX
 
 services:
   convertx:
-    # 🔍 힌트: GitHub Container Registry 이미지, v0.14.1 버전
-    #          형식: ghcr.io/작성자/이미지이름:버전
-    image: __________(2)__________
-    
+    image: ghcr.io/c4illin/convertx:0.14.1    
     container_name: convertx
-    restart: unless-stopped
-    
-    # 🔍 힌트: ⚠️ 특수 케이스!
-    #          ConvertX는 SQLite 데이터베이스 권한 문제로 root 필요
-    #          일반적으로는 $PUID:$PGID를 사용하지만, 이 앱은 예외!
-    #          rationale.md 파일에 이유를 설명해야 함
-    user: "__________(3)__________"
-    
+    restart: unless-stopped    
+    user: 0:0    
     deploy:
       resources:
         limits:
-          # 🔍 힌트: 파일 변환은 메모리를 많이 사용
-          #          G 단위로 지정 (예: 2G)
-          memory: __________(4)__________
-          cpus: '1.0'
-    
-    # 🔍 힌트: 웹 UI 포트는 3000
-    ____(5)____:
-      - __________(6)__________
-    
+          memory: 2G
+          cpus: '1.0'    
+    expose:
+      - 3000    
     environment:
-      # 🔍 힌트: Root로 실행하므로 PUID/PGID도 0으로 설정
-      - PUID=__________(7)__________
-      - PGID=__________(8)__________
+      - PUID=0
+      - PGID=0
       - JWT_SECRET=$default_pwd
       - ACCOUNT_REGISTRATION=false
       - HTTP_ALLOWED=true
       - ALLOW_UNAUTHENTICATED=false
-      - AUTO_DELETE_EVERY_N_HOURS=24
-    
+      - AUTO_DELETE_EVERY_N_HOURS=24    
     volumes:
-      # 🔍 힌트: SQLite 데이터베이스가 저장될 위치
-      - /DATA/AppData/$AppID/data:/app/data
-      
-      # 🔍 힌트: 변환할 파일을 읽어올 위치 (읽기 전용)
-      #          :ro를 붙여서 읽기 전용으로 마운트
-      - /DATA/Downloads:/downloads:__________(9)__________
-      - /DATA/Documents:/documents:__________(10)__________
-    
+      - /DATA/AppData/$AppID/data:/app/data      
+      - /DATA/Downloads:/downloads:ro
+      - /DATA/Documents:/documents:ro    
     healthcheck:
       test: ["CMD", "wget", "--spider", "--tries=1", "http://localhost:3000/"]
       interval: 30s
@@ -64,41 +35,29 @@ services:
 x-casaos:
   architectures:
     - amd64
-    - arm64
-  
-  main: convertx
-  
-  # 🔍 힌트: 설치 전에 데이터 디렉토리를 생성하고 권한 설정
-  #          chmod 777은 모든 사용자에게 읽기/쓰기/실행 권한 부여
+    - arm64  
+  main: convertx  
   pre-install-cmd: |
     mkdir -p /DATA/AppData/$AppID/data &&
     chmod -R 777 /DATA/AppData/$AppID/data &&
-    echo "ConvertX data directory prepared with full permissions"
-  
-  author: CasaOS Team
-  
-  # 🔍 힌트: 유틸리티 도구
-  category: __________(11)__________
-  
-  developer: C4illin
-  
+    echo "ConvertX data directory prepared with full permissions"  
+  author: CasaOS Team  
+  category: utilities  
+  developer: C4illin  
   icon: https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/icon.png
   screenshot_link:
     - https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/screenshot-1.png
     - https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/screenshot-2.png
     - https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/screenshot-3.png
-  thumbnail: https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/thumbnail.png
-  
+  thumbnail: https://cdn.jsdelivr.net/gh/Yundera/AppStore@main/Apps/ConvertX/thumbnail.png  
   title:
-    en_us: ConvertX
-  
+    en_us: ConvertX  
   tagline:
     en_us: Universal file converter supporting 1000+ formats
     ko_kr: 1000개 이상의 형식을 지원하는 범용 파일 변환기
     zh_cn: 支持1000多种格式的通用文件转换器
     fr_fr: Convertisseur de fichiers universel supportant plus de 1000 formats
-    es_es: Convertidor de archivos universal que admite más de 1000 formatos
-  
+    es_es: Convertidor de archivos universal que admite más de 1000 formatos  
   description:
     en_us: ConvertX is a self-hosted universal file converter that supports over 1000 different file formats. Convert images, videos, audio files, documents, 3D models, and more directly from your browser. All processing happens locally on your server, ensuring complete privacy and security. Built with TypeScript and powered by FFmpeg, Pandoc, ImageMagick, and other proven libraries for reliable file conversion.
     ko_kr: ConvertX는 1000개 이상의 다양한 파일 형식을 지원하는 자가 호스팅 범용 파일 변환기입니다. 브라우저에서 직접 이미지, 비디오, 오디오 파일, 문서, 3D 모델 등을 변환하세요. 모든 처리는 서버에서 로컬로 이루어져 완전한 개인정보 보호와 보안을 보장합니다. TypeScript로 구축되었으며 FFmpeg, Pandoc, ImageMagick 등 검증된 라이브러리로 구동되어 신뢰할 수 있는 파일 변환을 제공합니다.
@@ -129,65 +88,6 @@ x-casaos:
         **Note**: This app requires root permissions to function properly with SQLite database.
   
   index: /
-  
-  # 🔍 힌트: expose한 포트와 일치
-  webui_port: __________(12)__________
-  
-  # 🔍 힌트: name과 동일
-  store_app_id: __________(13)__________
-  
-  is_uncontrolled: __________(14)__________
-
-# ============================================================================
-# 📝 rationale.md 파일 내용 (참고용)
-# ============================================================================
-# # ConvertX Root Permissions Rationale
-# 
-# ## Why Root Access is Required
-# 
-# ConvertX requires root (0:0) permissions due to SQLite database file access
-# requirements. The application creates and manages a SQLite database that
-# requires specific ownership and permissions.
-# 
-# ## Security Considerations
-# 
-# - **Isolated Storage**: All data is contained within /DATA/AppData/convertx/
-# - **No User Directory Access**: Does not access /DATA/Documents, /DATA/Downloads
-#   except for read-only operations
-# - **Local Processing**: All file conversions happen locally, no external uploads
-# - **Access Control**: JWT authentication prevents unauthorized access
-# - **Account Registration**: Disabled by default (ACCOUNT_REGISTRATION=false)
-# 
-# ## Mitigation Measures
-# 
-# 1. **Volume Isolation**: Only mounts necessary directories
-# 2. **Read-Only Mounts**: User directories mounted as read-only (:ro)
-# 3. **Resource Limits**: Memory and CPU limits prevent resource exhaustion
-# 4. **Auto Cleanup**: Files automatically deleted after 24 hours
-# 5. **Authentication Required**: ALLOW_UNAUTHENTICATED=false enforces login
-# 
-# ## Alternative Approaches Considered
-# 
-# We attempted running with PUID:PGID but encountered:
-# - SQLite database permission errors
-# - File lock conflicts
-# - Inconsistent behavior across updates
-# 
-# The official ConvertX documentation recommends root access for production
-# deployments when using SQLite.
-# ============================================================================
-
-# ============================================================================
-# ✅ 완성 후 확인사항
-# ============================================================================
-# 1. user가 "0:0"으로 설정되어 있나요? (root 필요!)
-# 2. PUID와 PGID도 0으로 설정되어 있나요?
-# 3. 읽기 전용 볼륨에 :ro가 붙어 있나요?
-# 4. expose 포트와 webui_port가 일치하나요?
-# 5. 메모리 제한이 적절한가요? (파일 변환은 메모리를 많이 사용!)
-# ============================================================================
-
-# 🎓 학습 포인트
-# - 대부분의 앱은 $PUID:$PGID를 사용하지만
-# - 특별한 경우 root 권한이 필요할 수 있습니다
-# - 이 경우 rationale.md에 이유를 문서화해야 합니다!
+  webui_port: 3000
+  store_app_id: convertX 
+  is_uncontrolled: false
