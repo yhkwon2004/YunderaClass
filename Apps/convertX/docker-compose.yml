@@ -2,7 +2,7 @@ name: convertX
 
 services:
   convertx:
-    image: ghcr.io/c4illin/convertx:0.14.1    
+    image: ghcr.io/c4illin/convertx:v0.14.1    
     container_name: convertx
     restart: unless-stopped    
     user: "0:0"    
@@ -89,5 +89,3 @@ x-casaos:
   
   index: /
   webui_port: 3000
-  store_app_id: convertX 
-  is_uncontrolled: false
