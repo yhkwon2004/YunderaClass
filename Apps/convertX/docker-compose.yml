@@ -5,7 +5,7 @@ services:
     image: ghcr.io/c4illin/convertx:0.14.1    
     container_name: convertx
     restart: unless-stopped    
-    user: 0:0    
+    user: "0:0"    
     deploy:
       resources:
         limits:
